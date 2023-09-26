@@ -7,7 +7,7 @@ namespace MaterialsListAndEstimator
 {
     public partial class Form1 : Form
     {
-        private int GrandTotal = 0;
+        private double GrandTotal = 0;
 
         public Form1()
         {
@@ -29,7 +29,7 @@ namespace MaterialsListAndEstimator
                 string value = e.FormattedValue.ToString();
 
                 // If conversion to int fails then it is not an int, throw error
-                if (!int.TryParse(value, out int result))
+                if (!Double.TryParse(value, out double result))
                 {
                     e.Cancel = true;
                     MessageBox.Show("Unit Cost and/or Quantity must be numerical.  Clear the box and try again.", "Error");
@@ -50,8 +50,8 @@ namespace MaterialsListAndEstimator
             for (int i = 0; i < dataGridView.Rows.Count; i++)
             {
                 // Get the values of the 2nd and 3rd columns
-                int value1 = Convert.ToInt32(dataGridView.Rows[i].Cells[columnIndex1].Value);
-                int value2 = Convert.ToInt32(dataGridView.Rows[i].Cells[columnIndex2].Value);
+                double value1 = Convert.ToDouble(dataGridView.Rows[i].Cells[columnIndex1].Value);
+                double value2 = Convert.ToDouble(dataGridView.Rows[i].Cells[columnIndex2].Value);
 
                 // Multiply the values and set the value in the 4th column
                 dataGridView.Rows[i].Cells[3].Value = value1 * value2;
@@ -73,13 +73,13 @@ namespace MaterialsListAndEstimator
             for (int i = 0; i < dataGridView.Rows.Count; i++)
             {
                 // Get the values of the 4th columns
-                int value3 = Convert.ToInt32(dataGridView.Rows[i].Cells[columnIndex3].Value);
+                double value3 = Convert.ToDouble(dataGridView.Rows[i].Cells[columnIndex3].Value);
 
                 // Increment grand total by each subtotal
                 GrandTotal += value3;
             }
             // Set value to textBox in bottom left
-            textBox1.Text = GrandTotal.ToString();
+            textBox1.Text = "$" + GrandTotal.ToString();
         }
 
         private void Save(object sender, EventArgs e)
@@ -135,6 +135,9 @@ namespace MaterialsListAndEstimator
         // Save Button
         private void button1_Click(object sender, EventArgs e)
         {
+            // incase you made a change and didn't click calculate again
+            MultiplyColumns(sender, e);
+            AddTotal(sender, e);
             Save(sender, e);
         }
 
@@ -154,8 +157,8 @@ namespace MaterialsListAndEstimator
             // Reset grandTotal
             GrandTotal = 0;
 
-            // Set value to textBox in bottom left
-            textBox1.Text = GrandTotal.ToString();
+            // Set value to textBox in bottom left 
+            textBox1.Text = "$" + GrandTotal.ToString();
         }
     }
 }
