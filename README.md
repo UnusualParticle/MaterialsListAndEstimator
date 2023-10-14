@@ -1,8 +1,8 @@
 ## Materials List and Estimator
 
-![image](https://github.com/tempest918/MaterialsListAndEstimator/assets/30751667/daee117e-ea2a-4df7-8252-3d8bc5ab6330)
+![image](./assets/programScreenshot.png)
 
-Materials List and Estimator is a simple Windows Forms application that allows you to create a list of materials, their unit costs, quantities, and automatically calculates subtotals. You can also calculate the grand total and save the list to a text file.
+Materials List and Estimator is a simple Windows Forms application that allows you to create a list of materials, their unit costs, quantities, and automatically calculates subtotals. You can also calculate the grand total and save the list to and open it from a csv file.
 
 ## Features
 
@@ -10,7 +10,8 @@ Materials List and Estimator is a simple Windows Forms application that allows y
 - Validate input to ensure unit costs and quantities are numerical.
 - Calculate subtotals for each material automatically.
 - Calculate the grand total of all subtotals.
-- Save the list to a text file for future reference.
+- Save the list to a .CSV file for future reference.
+- Open a list from a .CSV file for editing.
 
 ## Installation
 
@@ -37,3 +38,5 @@ git clone https://github.com/tempest918/MaterialsListAndEstimator.git
 5. To save the list to a text file, click the "Save" button and choose a location to save the file.
 
 6. To clear the list and reset the grand total, click the "Clear" button.
+
+7. To open a list from storage, click the "Load CSV" button.
