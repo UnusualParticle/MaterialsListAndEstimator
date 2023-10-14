@@ -2,12 +2,14 @@ using System.Windows.Forms;
 using System.IO;
 using System.Data;
 using System;
+using System.Globalization;
 
 namespace MaterialsListAndEstimator
 {
     public partial class Form1 : Form
     {
         private double GrandTotal = 0;
+        private CultureInfo culture = CultureInfo.GetCultureInfo("en-US");
 
         public Form1()
         {
@@ -37,7 +39,8 @@ namespace MaterialsListAndEstimator
             }
         }
 
-        private void MultiplyColumns(object sender, EventArgs e)
+        // updates the subtotal column
+        private void MultiplyColumns()
         {
             // Get the DataGridView
             DataGridView dataGridView = this.dataGridView1;
@@ -58,7 +61,8 @@ namespace MaterialsListAndEstimator
             }
         }
 
-        private void AddTotal(object sender, EventArgs e)
+        // updates the grand total
+        private void AddTotal()
         {
             // Get the DataGridView
             DataGridView dataGridView = this.dataGridView1;
@@ -82,7 +86,15 @@ namespace MaterialsListAndEstimator
             textBox1.Text = "$" + GrandTotal.ToString();
         }
 
-        private void Save(object sender, EventArgs e)
+        // updates all totals
+        private void UpdateTotals()
+        {
+            MultiplyColumns();
+            AddTotal();
+        }
+
+        // saves the data to a csv file
+        private void SaveFile()
         {
             // Create a SaveFileDialog object
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -90,8 +102,8 @@ namespace MaterialsListAndEstimator
             // Set the initial directory to the current directory
             saveFileDialog.InitialDirectory = Environment.CurrentDirectory;
 
-            // Set the filter to text files.
-            saveFileDialog.Filter = "Text Files (*.txt)|*.txt";
+            // Set the filter to csv files.
+            saveFileDialog.Filter = "CSV Files (*.csv)|*.csv";
 
             // Show the SaveFileDialog.
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -128,28 +140,17 @@ namespace MaterialsListAndEstimator
                         }
 
                     }
+
+                    // Add the grand total so it wont have to be calculated by someonee just viewing the .csv file
+                    line = "\nGrand Total:       ";
+                    line += GrandTotal.ToString("C", culture);
+                    writer.WriteLine(line);
                 }
             }
         }
 
-        // Save Button
-        private void button1_Click(object sender, EventArgs e)
-        {
-            // incase you made a change and didn't click calculate again
-            MultiplyColumns(sender, e);
-            AddTotal(sender, e);
-            Save(sender, e);
-        }
-
-        // Calculate Button
-        private void button2_Click(object sender, EventArgs e)
-        {
-            MultiplyColumns(sender, e);
-            AddTotal(sender, e);
-        }
-
-        // Clear Button
-        private void button3_Click(object sender, EventArgs e)
+        // Clear all the data from the form
+        private void ClearTable()
         {
             //Clear the grid
             dataGridView1.Rows.Clear();
@@ -159,6 +160,77 @@ namespace MaterialsListAndEstimator
 
             // Set value to textBox in bottom left 
             textBox1.Text = "$" + GrandTotal.ToString();
+        }
+
+        // load a csv int othe table
+        private void LoadFile(string filename)
+        {
+            // Open the file
+            var f = File.OpenText(filename);
+            if (f == null) return;
+
+            // If the file can open, clear the data
+            ClearTable();
+
+            // read until file end
+            while (!f.EndOfStream)
+            {
+                // get a line with a minimum of 3 fields
+                string line = f.ReadLine();
+                string[] fields = line.Split(',');
+                if (fields.Length < 3)
+                    continue;
+
+                // trim any whitespace
+                for (int i = 0; i < fields.Length; i++)
+                {
+                    fields[i] = fields[i].Trim();
+                }
+
+                // validate that the data can be used
+                double test;
+                if (!Double.TryParse(fields[1], out test)
+                    || !Double.TryParse(fields[1], out test))
+                    continue;
+
+                // add data to the grid
+                dataGridView1.Rows.Add(fields);
+            }
+            f.Close();
+
+            // update totals based on data found
+            UpdateTotals();
+        }
+
+        // Save Button
+        private void buttonSave_Click(object sender, EventArgs e)
+        {
+            // incase you made a change and didn't click calculate again
+            UpdateTotals();
+            SaveFile();
+        }
+
+        // Calculate Button
+        private void buttonCalc_Click(object sender, EventArgs e)
+        {
+            UpdateTotals();
+        }
+
+        // Clear Button
+        private void buttonClear_Click(object sender, EventArgs e)
+        {
+            ClearTable();
+        }
+
+        private void buttonLoad_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "CSV Files (*.csv)|*.csv";
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                // Get the path and name of the selected file
+                LoadFile(ofd.FileName);
+            }
         }
     }
 }
